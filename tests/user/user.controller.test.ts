@@ -5,7 +5,7 @@ import {
 import { Request, Response } from 'express';
 import {
   createUser,
-  retriveUsers,
+  retrieveUsers,
 } from '../../src/components/user/user.service';
 import { generateAuthTokens } from '../../src/components/tokens/token.service';
 import User from '../../src/components/user/user.model';
@@ -64,7 +64,7 @@ describe('User Controller', () => {
       ] as User[];
 
       (
-        retriveUsers as jest.MockedFunction<typeof retriveUsers>
+        retrieveUsers as jest.MockedFunction<typeof retrieveUsers>
       ).mockResolvedValueOnce(mockUsers);
 
       await retrieveUsersController(
