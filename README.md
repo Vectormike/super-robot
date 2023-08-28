@@ -83,4 +83,4 @@ The Postman collection with all the endpoint documentation can be found [here](h
 
 ## Deployment
 
-The live version of the API is hosted on Heroku and can be accessed [here](Hosted-API-URL).
+The live version of the API is hosted on Heroku and can be accessed [here](https://risevesttest-276191955a1f.herokuapp.com/v1/).
