@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "jest",
-    "start": "cross-env NODE_ENV=development node dist/server.js",
+    "start": "node dist/src/server.js",
     "dev": "cross-env NODE_ENV=development nodemon src/server.ts",
     "build": "tsc -p .",
     "docker:prod": "docker-compose --env-file .env.production up -d"

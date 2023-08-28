@@ -1,5 +1,8 @@
 import { Sequelize } from 'sequelize';
 import Env from '../helpers/env';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 let sequelize: Sequelize;
 if (process.env.CLEARDB_DATABASE_URL) {
