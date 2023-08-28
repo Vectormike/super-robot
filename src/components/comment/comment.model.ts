@@ -73,10 +73,4 @@ Comment.init(
   },
 );
 
-// Comment.belongsTo(User, {
-//   foreignKey: 'userId',
-// });
-
-// Comment.belongsToMany(Post);
-
 export default Comment;
