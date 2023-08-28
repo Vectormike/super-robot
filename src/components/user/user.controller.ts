@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import catchAsync from '../../helpers/catchAsync';
-import { createUser, retriveUsers } from './user.service';
+import { createUser, retrieveUsers } from './user.service';
 import { generateAuthTokens } from '../tokens/token.service';
 import httpStatus from 'http-status';
 
@@ -20,7 +20,7 @@ const createUserController = catchAsync(async (req: Request, res: Response) => {
 
 const retrieveUsersController = catchAsync(
   async (req: Request, res: Response) => {
-    const users = await retriveUsers();
+    const users = await retrieveUsers();
     res.status(httpStatus.CREATED).send({
       success: true,
       message: 'Users retrieved successfully.',
