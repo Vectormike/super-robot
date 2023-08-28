@@ -1,0 +1,7 @@
+apis.rest
+node_modules
+.env
+.env.development
+.env.production
+dist
+data
