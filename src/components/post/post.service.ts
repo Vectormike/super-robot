@@ -6,6 +6,7 @@ import logger from '../../config/logger';
 import { CreatePostInput } from './post.interface';
 import User from '../user/user.model';
 import sequelize from '../../config/database';
+import redisClient from '../../config/redis';
 
 const createPost = async (userId: string, postDto: CreatePostInput) => {
   // Check if title or content already exists
@@ -40,15 +41,30 @@ const createPost = async (userId: string, postDto: CreatePostInput) => {
 };
 
 const retrievePosts = async (userId: string) => {
-  // Fetch posts of the user
-  const userPosts = await Post.findAll({ where: { userId: userId } });
+  const redisKey = `user:${userId}:posts`;
 
-  if (!userPosts) {
-    logger.warn(`Failed Post retrieval attempt due to no record.`);
-    throw new ApiError(httpStatus.BAD_REQUEST, 'No Post for this user exist.');
+  // Attempt to fetch posts from cache
+  const cachedPosts = await redisClient.get(redisKey);
+
+  if (cachedPosts) {
+    logger.info(`Posts retrieved from cache for user ID: ${userId}`);
+    return JSON.parse(cachedPosts);
   }
 
-  logger.info(`Post retrieved successful.`);
+  // If not in cache, fetch posts from the database
+  const userPosts = await Post.findAll({ where: { userId: userId } });
+
+  if (!userPosts || userPosts.length === 0) {
+    logger.warn(`Failed Post retrieval attempt due to no record.`);
+    throw new ApiError(httpStatus.BAD_REQUEST, 'No Post for this user exists.');
+  }
+
+  // Save posts to cache
+  await redisClient.set(redisKey, JSON.stringify(userPosts));
+
+  logger.info(
+    `Posts retrieved successfully from database for user ID: ${userId}.`,
+  );
 
   return userPosts;
 };
@@ -58,10 +74,6 @@ const addCommentToPost = async (
   userId: string,
   content: string,
 ) => {
-  // Create comment
-  console.log(postId, userId, content);
-
-  logger.info(``);
   const newComment = await Comment.create({
     content,
     postId,
@@ -71,50 +83,62 @@ const addCommentToPost = async (
   return newComment;
 };
 
-// Fetch the top 3 users with the most posts and, for each of those users, the latest comment they made.
 const getTopUsersWithLatestComment = async () => {
-  const getTopUsersWithLatestComment = async () => {
-    // Step 1: Identify the Top 3 Users with the Most Posts
-    logger.info(`Fetching top 3 users with the most posts...`);
-    const topUsers = await User.findAll({
-      attributes: [
-        'id',
-        'name',
-        'email',
-        [sequelize.fn('COUNT', sequelize.col('posts.id')), 'postCount'],
-      ],
-      include: {
-        model: Post,
-        attributes: [], // Empty attributes because we only need the count
-      },
-      group: ['User.id'],
-      order: [[sequelize.fn('COUNT', sequelize.col('posts.id')), 'DESC']],
-      limit: 3,
-      raw: true,
-      subQuery: false,
-    });
+  const redisKey = 'topUsersWithLatestComment';
 
-    // Join Results to Get Desired Output
-    const usersWithLatestComments = await Promise.all(
-      topUsers.map(async (user) => {
-        logger.info(`Fetching latest comment for user ID: ${user.id}`);
+  // Attempt to fetch data from cache
+  const cachedData = await redisClient.get(redisKey);
 
-        // Determine the Latest Comment for Each of Their Posts
-        const latestComment = await Comment.findOne({
-          where: { userId: user.id },
-          order: [['createdAt', 'DESC']],
-        });
+  if (cachedData) {
+    logger.info(`Top users with latest comments retrieved from cache`);
+    return JSON.parse(cachedData);
+  }
 
-        return {
-          ...user.toJSON(),
-          latestComment,
-        };
-      }),
-    );
+  // If not in cache, proceed with fetching from the database
 
-    logger.info('Completed fetching top users with their latest comments.');
-    return usersWithLatestComments;
-  };
+  // Step 1: Identify the Top 3 Users with the Most Posts
+  logger.info(`Fetching top 3 users with the most posts...`);
+  const topUsers = await User.findAll({
+    attributes: [
+      'id',
+      'name',
+      'email',
+      [sequelize.fn('COUNT', sequelize.col('posts.id')), 'postCount'],
+    ],
+    include: {
+      model: Post,
+      attributes: [], // Empty attributes because we only need the count
+    },
+    group: ['User.id'],
+    order: [[sequelize.fn('COUNT', sequelize.col('posts.id')), 'DESC']],
+    limit: 3,
+    raw: true,
+    subQuery: false,
+  });
+
+  // Join Results to Get Desired Output
+  const usersWithLatestComments = await Promise.all(
+    topUsers.map(async (user) => {
+      logger.info(`Fetching latest comment for user ID: ${user.id}`);
+
+      // Determine the Latest Comment for Each of Their Posts
+      const latestComment = await Comment.findOne({
+        where: { userId: user.id },
+        order: [['createdAt', 'DESC']],
+      });
+
+      return {
+        ...user,
+        latestComment,
+      };
+    }),
+  );
+
+  // Cache the results
+  await redisClient.set(redisKey, JSON.stringify(usersWithLatestComments));
+
+  logger.info('Completed fetching top users with their latest comments.');
+  return usersWithLatestComments;
 };
 
 export {
