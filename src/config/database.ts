@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize';
 import Env from '../helpers/env';
 
-let sequelize;
+let sequelize: Sequelize;
 if (process.env.CLEARDB_DATABASE_URL) {
   sequelize = new Sequelize(process.env.CLEARDB_DATABASE_URL, {
     dialect: 'mysql',
