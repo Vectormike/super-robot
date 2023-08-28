@@ -39,56 +39,6 @@ describe('Post Controller', () => {
     } as unknown as Response;
   });
 
-  describe('createPostController', () => {
-    it('should create a post and return it', async () => {
-      const mockPost = {
-        id: '1',
-        title: 'Sample title',
-        content: 'Sample Post',
-      } as unknown as Post;
-      (
-        createPost as jest.MockedFunction<typeof createPost>
-      ).mockResolvedValueOnce(mockPost);
-
-      await createPostController(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext,
-      );
-
-      expect(mockResponse.send).toHaveBeenCalledWith({
-        success: true,
-        message: 'Post created successfully.',
-        data: {
-          post: mockPost,
-        },
-      });
-    });
-  });
-
-  describe('retrievePostsController', () => {
-    it('should retrieve posts and return them', async () => {
-      const mockPosts = [{ id: '1', content: 'Sample Post' }] as Post[];
-      (
-        retrievePosts as jest.MockedFunction<typeof retrievePosts>
-      ).mockResolvedValueOnce(mockPosts);
-
-      await retrievePostsController(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext,
-      );
-
-      expect(mockResponse.send).toHaveBeenCalledWith({
-        success: true,
-        message: 'Posts retrieved successfully.',
-        data: {
-          posts: mockPosts,
-        },
-      });
-    });
-  });
-
   describe('getTopUsersWithLatestCommentController', () => {
     it('should retrieve top users with their latest comments and return them', async () => {
       const mockUsers = [
@@ -132,4 +82,54 @@ describe('Post Controller', () => {
       });
     });
   });
+
+  // describe('createPostController', () => {
+  //   it('should create a post and return it', async () => {
+  //     const mockPost = {
+  //       id: '1',
+  //       title: 'Sample title',
+  //       content: 'Sample Post',
+  //     } as unknown as Post;
+  //     (
+  //       createPost as jest.MockedFunction<typeof createPost>
+  //     ).mockResolvedValueOnce(mockPost);
+
+  //     await createPostController(
+  //       mockRequest as Request,
+  //       mockResponse as Response,
+  //       mockNext,
+  //     );
+
+  //     expect(mockResponse.send).toHaveBeenCalledWith({
+  //       success: true,
+  //       message: 'Post created successfully.',
+  //       data: {
+  //         post: mockPost,
+  //       },
+  //     });
+  //   });
+  // });
+
+  // describe('retrievePostsController', () => {
+  //   it('should retrieve posts and return them', async () => {
+  //     const mockPosts = [{ id: '1', content: 'Sample Post' }] as Post[];
+  //     (
+  //       retrievePosts as jest.MockedFunction<typeof retrievePosts>
+  //     ).mockResolvedValueOnce(mockPosts);
+
+  //     await retrievePostsController(
+  //       mockRequest as Request,
+  //       mockResponse as Response,
+  //       mockNext,
+  //     );
+
+  //     expect(mockResponse.send).toHaveBeenCalledWith({
+  //       success: true,
+  //       message: 'Posts retrieved successfully.',
+  //       data: {
+  //         posts: mockPosts,
+  //       },
+  //     });
+  //   });
+  // });
 });

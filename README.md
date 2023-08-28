@@ -79,16 +79,8 @@ npm test
 
 ## API Documentation
 
-The Postman collection with all the endpoint documentation can be found [here](Postman-Collection-Public-URL).
+The Postman collection with all the endpoint documentation can be found [here](https://documenter.getpostman.com/view/20922064/2s9Y5ZugQd#intro).
 
 ## Deployment
 
 The live version of the API is hosted on Heroku and can be accessed [here](Hosted-API-URL).
-
-## Feedback
-
-If you have any feedback or run into issues, please file an issue on this GitHub repository.
-
----
-
-Feel free to customize the README according to your project's specifics.
