@@ -53,7 +53,7 @@ describe('User Controller', () => {
     });
   });
 
-  describe('retriveUsersController', () => {
+  describe('retrieveUsersController', () => {
     it('should retrieve users', async () => {
       const mockUsers = [
         {
